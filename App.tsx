@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Text, StatusBar, View, StyleSheet, Platform } from 'react-native';
-import { createStackNavigator, createAppContainer, NavigationContainer } from 'react-navigation';
+import { createStackNavigator, createAppContainer, NavigationContainer, createBottomTabNavigator } from 'react-navigation';
 import { Provider, useDispatch, useSelector, connect } from 'react-redux'
 import { AppLoading } from 'expo';
 import {  } from './redux/actionTypes'
 
+import StackViewStyleInterpolator from 'react-navigation-stack/src/views/StackView/StackViewStyleInterpolator';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as SecureStore from 'expo-secure-store';
 import * as firebase from 'firebase/app';
@@ -12,6 +13,19 @@ import * as Font from 'expo-font';
 import store from './redux/store'
 
 import GetStarted from './views/GetStarted';
+import Login from './views/Login';
+import Register from './views/Register';
+import Timeline from './views/Timeline';
+import Profile from './views/Profile';
+import Story from './views/Story';
+import CameraView from './views/CameraView';
+import AddPicture from './views/AddPicture';
+import FriendList from './views/FriendList';
+import Chat from './views/Chat';
+import Search from './views/Search';
+import Settings from './views/Settings';
+import ProfileEdit from './views/ProfileEdit';
+import AccountManagement from './views/AccountManagement';
 
 const firebaseConfig = {
   apiKey: "AIzaSyBkDM9-ucB-5OzwCJhinVuqJg-zNVZ1kew",
@@ -33,7 +47,7 @@ const ConsumerApp: React.FC = () => {
   const [ready, setReady] = useState(false);
 
   const _startAsync = async () => {
-    firebase.initializeApp(firebaseConfig);
+    // firebase.initializeApp(firebaseConfig);
     await Font.loadAsync({
       'Mont-Bold': require('./assets/Montserrat-Bold.ttf'),
       'Mont': require('./assets/Montserrat-Regular.ttf'),
@@ -46,6 +60,89 @@ const ConsumerApp: React.FC = () => {
 
   }
 
+  //Navigators
+  const AuthStack: NavigationContainer = createStackNavigator({
+    GetStarted: GetStarted,
+    Login: Login,
+    Register: Register
+  }, {
+    transitionConfig: () => ({
+      screenInterpolator: StackViewStyleInterpolator.forHorizontal
+    }),
+    headerMode: 'none',
+    initialRouteName: 'GetStarted'
+  });
+
+  const AuthContainer: NavigationContainer = createAppContainer(AuthStack);
+
+  const FeedStack: NavigationContainer = createStackNavigator({
+    Timeline: Timeline,
+    Profile: Profile,
+    Story: Story,
+    Camera: CameraView,
+    AddPicture: AddPicture
+  }, { 
+    headerMode: 'none',
+    transitionConfig: () => ({
+      screenInterpolator: StackViewStyleInterpolator.forHorizontal
+    }),
+   });
+  const FriendsStack: NavigationContainer = createStackNavigator({
+    FriendList: FriendList,
+    Chat: Chat,
+    SearchFriends: Search,
+    Profile: Profile
+  }, { 
+    headerMode: 'none',
+    transitionConfig: () => ({
+      screenInterpolator: StackViewStyleInterpolator.forHorizontal
+    }),
+   });
+  const SettingsStack: NavigationContainer = createStackNavigator({
+    Settings: Settings,
+    Profile: Profile,
+    ProfileEdit: ProfileEdit,
+    AccountManagement: AccountManagement
+  }, { 
+    headerMode: 'none',
+    transitionConfig: () => ({
+      screenInterpolator: StackViewStyleInterpolator.forHorizontal
+    }),
+   });
+
+  const TabNav = createBottomTabNavigator({
+    Feed: FeedStack,
+    Friends: FriendsStack,
+    Settings: SettingsStack
+  }, {
+    initialRouteName: 'Feed',
+    tabBarOptions: {
+      style: {
+        borderTopWidth: 0.363636,
+        borderTopColor: '#FCE77D'
+      },
+      activeTintColor: '#FCE77D',
+      labelStyle: { fontWeight: '600', top: 0 },
+      activeBackgroundColor: '#292826',
+      inactiveBackgroundColor: '#292826',
+    }
+  });
+
+  const TabContainer: NavigationContainer = createAppContainer(TabNav);
+
+  const AppStack: NavigationContainer = createStackNavigator({
+    Auth: AuthContainer,
+    App: TabContainer
+  }, {
+    transitionConfig: () => ({
+      screenInterpolator: StackViewStyleInterpolator.forHorizontal
+    }),
+    headerMode: 'none',
+    initialRouteName: 'Auth'
+  })
+
+  const AppContainer = createAppContainer(AppStack);
+
   if(!ready) {
     return (
       <AppLoading 
@@ -56,7 +153,7 @@ const ConsumerApp: React.FC = () => {
     )
   } else {
     return (
-      <GetStarted/>
+      <AppContainer/>
     );
   }
 }
