@@ -112,7 +112,7 @@ const Register: React.FC<NavigationContainerProps> = ({ navigation }) => {
         <LinearGradient colors={['#dec12f', '#fae473']} style={{ width: '90%', height: 42, marginTop: 40, borderRadius: 30,
           alignItems: 'center', justifyContent: 'center' }} start={[0, 0]}>
           <Button containerStyle={{ backgroundColor: 'transparent', width: '100%', height: '100%' }} buttonStyle={{ backgroundColor: 'transparent', width: '100%', height: '100%' }} 
-            titleStyle={{ fontFamily: 'Mont-Bold', color: '#292826' }} title="Login" onPress={() => attemptRegister()}/>
+            titleStyle={{ fontFamily: 'Mont-Bold', color: '#FFF' }} title="Register" onPress={() => attemptRegister()}/>
         </LinearGradient>
       </View>
     </KeyboardAvoidingView>

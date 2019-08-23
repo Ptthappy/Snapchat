@@ -21,6 +21,7 @@ import Story from './views/Story';
 import CameraView from './views/CameraView';
 import AddPicture from './views/AddPicture';
 import FriendList from './views/FriendList';
+import RecentChats from './views/RecentChats';
 import Chat from './views/Chat';
 import Search from './views/Search';
 import Settings from './views/Settings';
@@ -88,9 +89,10 @@ const ConsumerApp: React.FC = () => {
     }),
    });
   const FriendsStack: NavigationContainer = createStackNavigator({
+    Chats: RecentChats,
     FriendList: FriendList,
     Chat: Chat,
-    SearchFriends: Search,
+    Search: Search,
     Profile: Profile
   }, { 
     headerMode: 'none',
@@ -98,9 +100,9 @@ const ConsumerApp: React.FC = () => {
       screenInterpolator: StackViewStyleInterpolator.forHorizontal
     }),
    });
-  const SettingsStack: NavigationContainer = createStackNavigator({
+  const UserStack: NavigationContainer = createStackNavigator({
+    OwnProfile: Profile,
     Settings: Settings,
-    Profile: Profile,
     ProfileEdit: ProfileEdit,
     AccountManagement: AccountManagement
   }, { 
@@ -113,20 +115,31 @@ const ConsumerApp: React.FC = () => {
   const TabNav = createBottomTabNavigator({
     Feed: FeedStack,
     Friends: FriendsStack,
-    Settings: SettingsStack
+    User: UserStack
   }, {
     initialRouteName: 'Feed',
     tabBarOptions: {
       style: {
-        borderTopWidth: 0.363636,
+        borderTopWidth: 0.2,
         borderTopColor: '#FCE77D'
       },
       activeTintColor: '#FCE77D',
-      labelStyle: { fontWeight: '600', top: 0 },
+      labelStyle: { fontFamily: 'Mont-Light', top: 0 },
       activeBackgroundColor: '#292826',
       inactiveBackgroundColor: '#292826',
-    }
-  });
+    }, defaultNavigationOptions: ({ navigation }) => ({
+      tabBarIcon: ({ focused, tintColor }) => {
+        const { routeName } = navigation.state;
+        switch(routeName) {
+          case 'Feed': return <Icon name={focused ? 'home' : 'home-outline'} size={28} color={tintColor} style={{ top: 4 }} />;
+          case 'Friends': return <Icon name={focused ? 'camera' : 'camera-outline'} size={28} color={tintColor} style={{ top: 4 }} />;
+          case 'User': return <Icon name={focused ? 'account-circle' : 'account-circle-outline'} size={28} color={tintColor} style={{ top: 4 }} />;
+          default: return null;
+        }
+
+      }, tabBarVisible: !(excludedTabView.indexOf(navigation.state.routes[navigation.state.index].routeName) >= 0)
+    })
+  }); const excludedTabView = ['Search', 'FriendList', 'Settings', 'EditProfile', 'Story', 'Camera', 'AddPicture', 'Chat', 'Profile'];
 
   const TabContainer: NavigationContainer = createAppContainer(TabNav);
 
@@ -138,7 +151,7 @@ const ConsumerApp: React.FC = () => {
       screenInterpolator: StackViewStyleInterpolator.forHorizontal
     }),
     headerMode: 'none',
-    initialRouteName: 'Auth'
+    initialRouteName: 'App'
   })
 
   const AppContainer = createAppContainer(AppStack);
