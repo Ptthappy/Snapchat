@@ -27,6 +27,7 @@ import Search from './views/Search';
 import Settings from './views/Settings';
 import ProfileEdit from './views/ProfileEdit';
 import AccountManagement from './views/AccountManagement';
+import PictureView from './views/PictureView';
 
 const firebaseConfig = {
   apiKey: "AIzaSyBkDM9-ucB-5OzwCJhinVuqJg-zNVZ1kew",
@@ -79,6 +80,7 @@ const ConsumerApp: React.FC = () => {
   const FeedStack: NavigationContainer = createStackNavigator({
     Timeline: Timeline,
     Profile: Profile,
+    PictureView: PictureView,
     Story: Story,
     Camera: CameraView,
     AddPicture: AddPicture
@@ -93,7 +95,8 @@ const ConsumerApp: React.FC = () => {
     FriendList: FriendList,
     Chat: Chat,
     Search: Search,
-    Profile: Profile
+    Profile: Profile,
+    PictureView: PictureView
   }, { 
     headerMode: 'none',
     transitionConfig: () => ({
@@ -102,6 +105,7 @@ const ConsumerApp: React.FC = () => {
    });
   const UserStack: NavigationContainer = createStackNavigator({
     OwnProfile: Profile,
+    PictureView: PictureView,
     Settings: Settings,
     ProfileEdit: ProfileEdit,
     AccountManagement: AccountManagement
@@ -139,7 +143,8 @@ const ConsumerApp: React.FC = () => {
 
       }, tabBarVisible: !(excludedTabView.indexOf(navigation.state.routes[navigation.state.index].routeName) >= 0)
     })
-  }); const excludedTabView = ['Search', 'FriendList', 'Settings', 'EditProfile', 'Story', 'Camera', 'AddPicture', 'Chat', 'Profile'];
+  }); const excludedTabView = ['Search', 'FriendList', 'Settings', 'EditProfile', 'Story', 'Camera',
+        'AddPicture', 'Chat', 'Profile', 'PictureView'];
 
   const TabContainer: NavigationContainer = createAppContainer(TabNav);
 

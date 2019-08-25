@@ -1,12 +1,15 @@
-import React from 'react';
-import { View, Text } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { NavigationContainerProps } from 'react-navigation';
-import { Button } from 'react-native-elements';
+import { Overlay, Button, colors } from 'react-native-elements';
 
 import AppHeader from '../components/AppHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const Settings: React.FC<NavigationContainerProps> = ({ navigation }) => {
+  const [isVisible, setVisible] = useState(false);
+  const colorSets = [['white', 'blue', 'red'], ['yellow', 'black', 'green'], ['purple', 'orange', 'magenta']];
+
   return (
     <View style={{ flex: 1, backgroundColor: '#292826' }}>
       <AppHeader 
@@ -18,28 +21,59 @@ const Settings: React.FC<NavigationContainerProps> = ({ navigation }) => {
         /> }
       />
 
+      <Overlay isVisible={isVisible} overlayBackgroundColor='#494949' height={320} width='90%' 
+        overlayStyle={{ alignItems: 'center' }} >
+        <View style={{ width: '100%', alignItems: 'center', flexDirection: 'column' }}>
+          <Text style={{ fontFamily: 'Mont-Bold', fontSize: 18, textAlign: 'center', paddingTop: 5, color: '#fff' }}>Set Secondary Color</Text>
+          <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 4, marginTop: 20 }}>
+            <TouchableOpacity style={{ height: 60, width: 60, borderRadius: 40, backgroundColor: 'white', marginHorizontal: 9 }} />
+            <TouchableOpacity style={{ height: 60, width: 60, borderRadius: 40, backgroundColor: 'blue', marginHorizontal: 9 }} />
+            <TouchableOpacity style={{ height: 60, width: 60, borderRadius: 40, backgroundColor: 'red', marginHorizontal: 9 }} />
+            <TouchableOpacity style={{ height: 60, width: 60, borderRadius: 40, backgroundColor: 'yellow', marginHorizontal: 9 }} />
+          </View>
+          <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginVertical: 4 }}>
+            <TouchableOpacity style={{ height: 60, width: 60, borderRadius: 40, backgroundColor: 'yellow', marginHorizontal: 9 }} />
+            <TouchableOpacity style={{ height: 60, width: 60, borderRadius: 40, backgroundColor: 'green', marginHorizontal: 9 }} />
+            <TouchableOpacity style={{ height: 60, width: 60, borderRadius: 40, backgroundColor: 'purple', marginHorizontal: 9 }} />
+            <TouchableOpacity style={{ height: 60, width: 60, borderRadius: 40, backgroundColor: 'blue', marginHorizontal: 9 }} />
+          </View>
+          <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginVertical: 4 }}>
+            <TouchableOpacity style={{ height: 60, width: 60, borderRadius: 40, backgroundColor: 'orange', marginHorizontal: 9 }} />
+            <TouchableOpacity style={{ height: 60, width: 60, borderRadius: 40, backgroundColor: 'blue', marginHorizontal: 9 }} />
+            <TouchableOpacity style={{ height: 60, width: 60, borderRadius: 40, backgroundColor: 'magenta', marginHorizontal: 9 }} />
+            <TouchableOpacity style={{ height: 60, width: 60, borderRadius: 40, backgroundColor: 'black', marginHorizontal: 9 }} />
+          </View>
+          <View style={{ width: '100%', justifyContent: 'flex-end', flexDirection: 'row' }}>
+            <Button title='Cancel'
+            buttonStyle={{ backgroundColor: 'transparent', height: 40, width: 90, marginBottom: 8, marginTop: 10 }}
+            titleStyle={{ fontFamily: 'Mont-Bold', fontSize: 14 }}
+            onPress={() => setVisible(false)} />
+          </View>
+        </View>
+      </Overlay>
+
       <Button
         title='Edit Profile'
         type='outline'
-        buttonStyle={{ height: 120, width: '100%', borderRightWidth: 0, borderLeftWidth: 0, justifyContent: 'flex-start', borderColor: '#fff' }}
+        buttonStyle={{ height: 100, width: '100%', borderRightWidth: 0, borderLeftWidth: 0, justifyContent: 'flex-start', borderColor: '#fff' }}
         titleStyle={{ fontFamily: 'Mont', fontSize: 27, color: '#fff', textAlign: 'left', paddingLeft: 15 }}
         icon={<Icon name='account-edit' size={40} style={{ color: '#fff', marginLeft: 18, marginRight: 10 }} />}
-        onPress={() => navigation.navigate('EditProfile')}
+        onPress={() => navigation.navigate('ProfileEdit')}
       />
 
       <Button
         title='Secondary Color'
         type='outline'
-        buttonStyle={{ height: 120, width: '100%', borderRightWidth: 0, borderLeftWidth: 0, justifyContent: 'flex-start', borderColor: '#fff' }}
+        buttonStyle={{ height: 100, width: '100%', borderRightWidth: 0, borderLeftWidth: 0, justifyContent: 'flex-start', borderColor: '#fff' }}
         titleStyle={{ fontFamily: 'Mont', fontSize: 27, color: '#fff', textAlign: 'left', paddingLeft: 15 }}
         icon={<Icon name='account-edit' size={40} style={{ color: '#fff', marginLeft: 18, marginRight: 10 }} />}
-        onPress={() => console.log('Desplegar modal con los colorcitos jeje')}
+        onPress={() => setVisible(true)}
       />
 
       <Button
         title='Logout'
         type='outline'
-        buttonStyle={{ height: 120, width: '100%', borderRightWidth: 0, borderLeftWidth: 0, justifyContent: 'flex-start', borderColor: '#fff' }}
+        buttonStyle={{ height: 100, width: '100%', borderRightWidth: 0, borderLeftWidth: 0, justifyContent: 'flex-start', borderColor: '#fff' }}
         titleStyle={{ fontFamily: 'Mont', fontSize: 27, color: '#d93636', textAlign: 'left', paddingLeft: 15 }}
         icon={<Icon name='exit-to-app' size={40} style={{ color: '#fff', marginLeft: 18, marginRight: 10 }} />}
         onPress={() => navigation.dangerouslyGetParent().navigate('Auth')}
