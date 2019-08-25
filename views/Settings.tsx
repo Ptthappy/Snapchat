@@ -1,14 +1,28 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, AsyncStorage } from 'react-native';
 import { NavigationContainerProps } from 'react-navigation';
 import { Overlay, Button, colors } from 'react-native-elements';
+import { useDispatch } from 'react-redux';
+import { SET_USER } from '../redux/actionTypes';
 
 import AppHeader from '../components/AppHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import * as firebase from 'firebase/app';
+import 'firebase/auth';
 
 const Settings: React.FC<NavigationContainerProps> = ({ navigation }) => {
   const [isVisible, setVisible] = useState(false);
-  const colorSets = [['white', 'blue', 'red'], ['yellow', 'black', 'green'], ['purple', 'orange', 'magenta']];
+
+  const dispatch = useDispatch();
+
+  const logout = async () => {
+    await firebase.auth().signOut()
+      .then(async () => {
+        await AsyncStorage.removeItem('USER');
+        dispatch({ type: SET_USER, payload: { user: null } });
+        navigation.navigate('Auth');
+      });
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: '#292826' }}>
@@ -46,7 +60,7 @@ const Settings: React.FC<NavigationContainerProps> = ({ navigation }) => {
           <View style={{ width: '100%', justifyContent: 'flex-end', flexDirection: 'row' }}>
             <Button title='Cancel'
             buttonStyle={{ backgroundColor: 'transparent', height: 40, width: 90, marginBottom: 8, marginTop: 10 }}
-            titleStyle={{ fontFamily: 'Mont-Bold', fontSize: 14 }}
+            titleStyle={{ fontFamily: 'Mont-Bold', fontSize: 18 }}
             onPress={() => setVisible(false)} />
           </View>
         </View>
@@ -76,7 +90,7 @@ const Settings: React.FC<NavigationContainerProps> = ({ navigation }) => {
         buttonStyle={{ height: 100, width: '100%', borderRightWidth: 0, borderLeftWidth: 0, justifyContent: 'flex-start', borderColor: '#fff' }}
         titleStyle={{ fontFamily: 'Mont', fontSize: 27, color: '#d93636', textAlign: 'left', paddingLeft: 15 }}
         icon={<Icon name='exit-to-app' size={40} style={{ color: '#fff', marginLeft: 18, marginRight: 10 }} />}
-        onPress={() => navigation.dangerouslyGetParent().navigate('Auth')}
+        onPress={() => logout()}
       />
     </View>
   );

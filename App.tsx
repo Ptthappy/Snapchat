@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Text, StatusBar, View, StyleSheet, Platform } from 'react-native';
+import { StatusBar, View, StyleSheet, Platform, AsyncStorage } from 'react-native';
 import { createStackNavigator, createAppContainer, NavigationContainer, createBottomTabNavigator } from 'react-navigation';
 import { Provider, useDispatch, useSelector, connect } from 'react-redux'
 import { AppLoading } from 'expo';
-import {  } from './redux/actionTypes'
+import { SET_USER } from './redux/actionTypes'
 
 import StackViewStyleInterpolator from 'react-navigation-stack/src/views/StackView/StackViewStyleInterpolator';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -49,7 +49,7 @@ const ConsumerApp: React.FC = () => {
   const [ready, setReady] = useState(false);
 
   const _startAsync = async () => {
-    // firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig);
     await Font.loadAsync({
       'Mont-Bold': require('./assets/Montserrat-Bold.ttf'),
       'Mont': require('./assets/Montserrat-Regular.ttf'),
@@ -59,8 +59,15 @@ const ConsumerApp: React.FC = () => {
   }
 
   const _retrieveState = async () => {
-
+    const _user = await AsyncStorage.getItem('USER');
+    if(_user !== null) {
+      dispatch({ type: SET_USER, payload: { user: JSON.parse(_user) } });
+    }
   }
+
+  useEffect(() => {
+    _retrieveState();
+  }, []);
 
   //Navigators
   const AuthStack: NavigationContainer = createStackNavigator({
@@ -156,7 +163,7 @@ const ConsumerApp: React.FC = () => {
       screenInterpolator: StackViewStyleInterpolator.forHorizontal
     }),
     headerMode: 'none',
-    initialRouteName: 'App'
+    initialRouteName: user ? 'App' : 'Auth'
   })
 
   const AppContainer = createAppContainer(AppStack);

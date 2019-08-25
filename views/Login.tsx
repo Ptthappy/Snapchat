@@ -1,19 +1,33 @@
-import React, { useState } from 'react';
-import { View, Text } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, AsyncStorage } from 'react-native';
 import { Button, Image, Input } from 'react-native-elements';
 import { NavigationContainerProps } from 'react-navigation';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useDispatch } from 'react-redux';
 
+import * as firebase from 'firebase';
+import "firebase/auth";
 import AppHeader from '../components/AppHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { SET_USER } from '../redux/actionTypes';
 
 const Login: React.FC<NavigationContainerProps> = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
+  const [ready, setReady] = useState(false);
+
+  const dispatch = useDispatch();
 
   const login = async () => {
-    navigation.dangerouslyGetParent().navigate('App')
+    setReady(false);
+    await firebase.auth().signInWithEmailAndPassword(email, password)
+      .then(async data => {
+        console.log(firebase.auth().currentUser);
+        await AsyncStorage.setItem('USER', JSON.stringify(firebase.auth().currentUser));
+        dispatch({ type: SET_USER, payload: { user: firebase.auth().currentUser } });
+        navigation.navigate('App');
+      }).catch(console.log);
   }
 
   return (

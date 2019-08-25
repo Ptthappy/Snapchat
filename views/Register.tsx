@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
+import { View, TouchableOpacity, KeyboardAvoidingView, ScrollView, AsyncStorage } from 'react-native';
 import { Image, Button, Input } from 'react-native-elements';
 import { NavigationContainerProps } from 'react-navigation';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useDispatch } from 'react-redux';
 
 import AppHeader from '../components/AppHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import * as firebase from 'firebase/app';
+import 'firebase/auth';
+import { SET_USER } from '../redux/actionTypes';
 
 const Register: React.FC<NavigationContainerProps> = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -14,13 +18,20 @@ const Register: React.FC<NavigationContainerProps> = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [_password, _setPassword] = useState('');
 
+  const dispatch = useDispatch();
+
   const attemptRegister = async () => {
-    navigation.dangerouslyGetParent().navigate('App');
+    firebase.auth().createUserWithEmailAndPassword(email, password)
+      .then(async data => {
+        await AsyncStorage.setItem('USER', JSON.stringify(firebase.auth().currentUser));
+        dispatch({ type: SET_USER, payload: { user: firebase.auth().currentUser } });
+        navigation.navigate('App');
+      })
   }
 
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior='padding'>
-      <View style={{ alignItems: 'center', backgroundColor: '#292826', width: '100%', height: '100%' }}>
+      <ScrollView style={{ backgroundColor: '#292826', width: '100%', height: '100%' }} contentContainerStyle={{ alignItems: 'center' }}>
         <AppHeader
           title='Register User'
           leftComponent={<Button
@@ -109,12 +120,12 @@ const Register: React.FC<NavigationContainerProps> = ({ navigation }) => {
             secureTextEntry
           />
 
-        <LinearGradient colors={['#dec12f', '#fae473']} style={{ width: '90%', height: 42, marginTop: 40, borderRadius: 30,
+        <LinearGradient colors={['#dec12f', '#fae473']} style={{ width: '90%', height: 42, marginTop: 40, marginBottom: 40, borderRadius: 30,
           alignItems: 'center', justifyContent: 'center' }} start={[0, 0]}>
           <Button containerStyle={{ backgroundColor: 'transparent', width: '100%', height: '100%' }} buttonStyle={{ backgroundColor: 'transparent', width: '100%', height: '100%' }} 
             titleStyle={{ fontFamily: 'Mont-Bold', color: '#FFF' }} title="Register" onPress={() => attemptRegister()}/>
         </LinearGradient>
-      </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
