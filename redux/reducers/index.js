@@ -1,4 +1,4 @@
-import { SET_USER, SET_COLOR } from '../actionTypes'
+import { SET_USER, SET_COLOR, SET_CREDENTIALS } from '../actionTypes'
 import { AsyncStorage } from 'react-native'
 
 const initialState = {
@@ -23,6 +23,13 @@ export default function(state = initialState, action) {
         color: color
       }
     }
+
+    case SET_CREDENTIALS:
+      const { credentials } = action.payload;
+      return {
+        ...state,
+        credentials: credentials
+      }
 
     default: return state;
   }

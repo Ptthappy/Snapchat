@@ -1,14 +1,19 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, Dimensions } from 'react-native';
+import { Image } from 'react-native-elements';
 import AppHeader from '../components/AppHeader';
 import { Button } from 'react-native-elements';
+import { useSelector } from 'react-redux';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { NavigationContainerProps } from 'react-navigation';
 
 const PictureView: React.FC<NavigationContainerProps> = ({ navigation }) => {
+  const width = Dimensions.get('window').width;
+  const user = useSelector(store => store.user);
+
   return (
-    <View style={{ flex: 1, backgroundColor: '#000' }}>
+    <View style={{ flex: 1, backgroundColor: '#000', alignItems: 'center' }}>
       <AppHeader
         title={ typeof navigation.getParam('name') === 'undefined' ? 'Profile Picture' : navigation.getParam('name')}
         color='#000'
@@ -18,6 +23,11 @@ const PictureView: React.FC<NavigationContainerProps> = ({ navigation }) => {
           buttonStyle={{ height: 35, width: 35, borderRadius: 1000, marginTop: -23, paddingRight: 5, backgroundColor: 'transparent' }}
           onPress={() => navigation.goBack() }
         /> }
+      />
+
+      <Image
+        source={user.imgUrl === '' ? require('../assets/default.png') : { uri: user.imgUrl }}
+        style={{ width: width, height: width, marginTop: '30%' }}
       />
     </View>
   );

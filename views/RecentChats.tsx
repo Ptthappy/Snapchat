@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, Text } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationContainerProps } from 'react-navigation';
 
@@ -23,6 +23,15 @@ const RecentChats: React.FC<NavigationContainerProps> = ({ navigation }) => {
         elevation: 10, alignItems: 'center', justifyContent: 'center' }} onPress={() => navigation.navigate('FriendList')} >
         <Icon name='account' size={28} style={{ color: '#292826', bottom: 1 }} />
       </TouchableOpacity>
+
+      {/* Primero un boton que lleve a las friend request y luego los chats como tal */}
+      <TouchableOpacity 
+        style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', height: 100, width: '100%', backgroundColor: '#272624' }}
+        onPress={() => navigation.navigate('Requests')}>
+          <Icon name='account-clock' size={35} style={{ color: '#FFDB24', paddingHorizontal: 20 }} />
+        <Text style={{ fontFamily: 'Mont-Bold', fontSize: 20, color: '#d0d0d0' }}>Manage Friend Requests</Text>
+      </TouchableOpacity>
+      <View style={{ height: 0.5, width: '100%', backgroundColor: '#999' }} />
     </View>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, AsyncStorage } from 'react-native';
+import { View, Text, AsyncStorage, Keyboard } from 'react-native';
 import { Button, Image, Input } from 'react-native-elements';
 import { NavigationContainerProps } from 'react-navigation';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -9,25 +9,41 @@ import * as firebase from 'firebase';
 import "firebase/auth";
 import AppHeader from '../components/AppHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { SET_USER } from '../redux/actionTypes';
+import { SET_USER, SET_CREDENTIALS } from '../redux/actionTypes';
+import LoadingView from './LoadingView';
 
 const Login: React.FC<NavigationContainerProps> = ({ navigation }) => {
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
-  const [ready, setReady] = useState(false);
+  const [imgUrl, setImgUrl] = useState('');
 
   const dispatch = useDispatch();
 
   const login = async () => {
-    setReady(false);
+    setLoading(true);
+    Keyboard.dismiss();
     await firebase.auth().signInWithEmailAndPassword(email, password)
       .then(async data => {
-        console.log(firebase.auth().currentUser);
-        await AsyncStorage.setItem('USER', JSON.stringify(firebase.auth().currentUser));
-        dispatch({ type: SET_USER, payload: { user: firebase.auth().currentUser } });
-        navigation.navigate('App');
+        if(data) {
+          firebase.database().ref('users/' + data.user.uid).once('value').then(async snap => {
+            const username = snap.val().username;
+            const name = snap.val().name;
+            const friends = snap.val().friends;
+            const stories = snap.val().stories;
+            const imgUrl = snap.val().imgUrl;
+            await AsyncStorage.setItem('CREDENTIALS', JSON.stringify(firebase.auth().currentUser));
+            await AsyncStorage.setItem('USER', JSON.stringify({ username: username, name: name, uid: firebase.auth().currentUser.uid, imgUrl: imgUrl, friends: friends, stories: stories }));
+            dispatch({ type: SET_CREDENTIALS, payload: { credentials: firebase.auth().currentUser } });
+            dispatch({ type: SET_USER, payload: { user: { username: username, name: name, uid: firebase.auth().currentUser.uid, imgUrl: imgUrl, friends: friends, stories: stories } } })
+            navigation.navigate('App');
+          }).catch(console.log);
+        } else {
+          console.log('Login Error');
+        }
       }).catch(console.log);
+      setLoading(false);
   }
 
   return (
@@ -41,13 +57,15 @@ const Login: React.FC<NavigationContainerProps> = ({ navigation }) => {
         /> }
       />
 
+      {loading && <LoadingView /> }
+
       <Image
         source={require('../assets/icon.png')}
         style={{ height: 100, width: 100, marginTop: 40 }}
       />
 
       <Input 
-        placeholder='Email'
+        placeholder='Email' keyboardType='email-address'
         placeholderTextColor='#A0A0A0'
         leftIcon={<Icon name='email' color='#FFDB24' size={26} style={{ right: 10 }} />}
         containerStyle={{ marginTop: 40, width: '90%', backgroundColor: '#EAEAEA', height: 46, justifyContent: 'center', borderRadius: 30, borderWidth: 1, borderColor: '#FCE77D' }}

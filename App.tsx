@@ -3,7 +3,7 @@ import { StatusBar, View, StyleSheet, Platform, AsyncStorage } from 'react-nativ
 import { createStackNavigator, createAppContainer, NavigationContainer, createBottomTabNavigator } from 'react-navigation';
 import { Provider, useDispatch, useSelector, connect } from 'react-redux'
 import { AppLoading } from 'expo';
-import { SET_USER } from './redux/actionTypes'
+import { SET_USER, SET_CREDENTIALS } from './redux/actionTypes'
 
 import StackViewStyleInterpolator from 'react-navigation-stack/src/views/StackView/StackViewStyleInterpolator';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -28,13 +28,14 @@ import Settings from './views/Settings';
 import ProfileEdit from './views/ProfileEdit';
 import AccountManagement from './views/AccountManagement';
 import PictureView from './views/PictureView';
+import Requests from './views/Requests';
 
 const firebaseConfig = {
   apiKey: "AIzaSyBkDM9-ucB-5OzwCJhinVuqJg-zNVZ1kew",
   authDomain: "snap-back-18e40.firebaseapp.com",
   databaseURL: "https://snap-back-18e40.firebaseio.com",
   projectId: "snap-back-18e40",
-  storageBucket: "",
+  storageBucket: "gs://snap-back-18e40.appspot.com",
   messagingSenderId: "98179254214",
   appId: "1:98179254214:web:7c86821c9055c54d"
 }
@@ -44,7 +45,7 @@ const ConsumerApp: React.FC = () => {
   console.disableYellowBox = true;
 
   const dispatch = useDispatch();
-  const user = useSelector(state => state.user);
+  const credentials = useSelector(state => state.credentials);
   
   const [ready, setReady] = useState(false);
 
@@ -59,8 +60,10 @@ const ConsumerApp: React.FC = () => {
   }
 
   const _retrieveState = async () => {
+    const _credentials = await AsyncStorage.getItem('CREDENTIALS');
     const _user = await AsyncStorage.getItem('USER');
-    if(_user !== null) {
+    if(_credentials !== null) {
+      dispatch({ type: SET_CREDENTIALS, payload: { credentials: JSON.parse(_credentials) } })
       dispatch({ type: SET_USER, payload: { user: JSON.parse(_user) } });
     }
   }
@@ -103,7 +106,8 @@ const ConsumerApp: React.FC = () => {
     Chat: Chat,
     Search: Search,
     Profile: Profile,
-    PictureView: PictureView
+    PictureView: PictureView,
+    Requests: Requests
   }, { 
     headerMode: 'none',
     transitionConfig: () => ({
@@ -143,7 +147,7 @@ const ConsumerApp: React.FC = () => {
         const { routeName } = navigation.state;
         switch(routeName) {
           case 'Feed': return <Icon name={focused ? 'home' : 'home-outline'} size={28} color={tintColor} style={{ top: 4 }} />;
-          case 'Friends': return <Icon name={focused ? 'camera' : 'camera-outline'} size={28} color={tintColor} style={{ top: 4 }} />;
+          case 'Friends': return <Icon name={focused ? 'account-multiple' : 'account-multiple-outline'} size={28} color={tintColor} style={{ top: 4 }} />;
           case 'User': return <Icon name={focused ? 'account-circle' : 'account-circle-outline'} size={28} color={tintColor} style={{ top: 4 }} />;
           default: return null;
         }
@@ -163,7 +167,7 @@ const ConsumerApp: React.FC = () => {
       screenInterpolator: StackViewStyleInterpolator.forHorizontal
     }),
     headerMode: 'none',
-    initialRouteName: user ? 'App' : 'Auth'
+    initialRouteName: credentials ? 'App' : 'Auth'
   })
 
   const AppContainer = createAppContainer(AppStack);

@@ -1,15 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, Dimensions, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Button, Image } from 'react-native-elements';
 import { NavigationContainerProps } from 'react-navigation';
+import { useSelector } from 'react-redux';
+import * as firebase from 'firebase/app';
+import 'firebase/firestore';
 
 import AppHeader from '../components/AppHeader';
 import StoryCard from '../components/StoryCard';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const Profile: React.FC<NavigationContainerProps> = ({ navigation }) => {
-  const [name, setName] = useState('Julieta Tallaferro');
-  const [username, setUsername] = useState('wondergirl');
+  const [user, setUser] = useState(useSelector(store => store.user));
+  const [own, setOwn] = useState(true);
+
+  useEffect(() => {
+    if(typeof navigation.getParam('user') !== 'undefined') {
+      setUser(navigation.getParam('user')); 
+      setOwn(false);
+    }
+  }, []);
 
   const width = Dimensions.get('window').width;
 
@@ -17,7 +27,7 @@ const Profile: React.FC<NavigationContainerProps> = ({ navigation }) => {
     <View style={{ flex: 1, backgroundColor: '#292826' }}>
       <AppHeader
         title='Profile'
-        rightComponent={<Button
+        rightComponent={own && <Button
           icon={<Icon name='settings' size={25} style={{ color: '#292826' }} />}
           buttonStyle={{ height: 35, width: 35, borderRadius: 1000, marginTop: -23, paddingLeft: 2, backgroundColor: 'transparent' }}
           onPress={() => navigation.navigate('Settings')}
@@ -30,21 +40,22 @@ const Profile: React.FC<NavigationContainerProps> = ({ navigation }) => {
           borderWidth: 2, borderColor: '#FCE77D', borderRadius: 1000 }}
           onPress={() => navigation.navigate('PictureView')}
           ><Image
-            source={require('../assets/default.png')}
+            source={user.imgUrl !== '' ? { uri: user.imgUrl } : require('../assets/default.png')}
             style={{ width: '100%', height: '100%', borderRadius: 1000 }}
+            PlaceholderContent={<ActivityIndicator />}
           />
         </TouchableOpacity>
         
         <View style={{ width: width - 30 - (width / 2.35) }}>
-          <Text style={{ paddingRight: 10, paddingLeft: 20, paddingBottom: 10, paddingTop: 47, textAlign: 'left', fontFamily: 'Mont', fontSize: 24, color: '#fff' }}>{username}</Text>
-          <Text style={{ paddingRight: 10, paddingLeft: 20, paddingBottom: 20, textAlign: 'left', fontFamily: 'Mont', fontSize: 20, color: '#fff' }}>{name}</Text>
+          <Text style={{ paddingRight: 10, paddingLeft: 20, paddingBottom: 10, paddingTop: 47, textAlign: 'left', fontFamily: 'Mont', fontSize: 24, color: '#fff' }}>@{user.username}</Text>
+          <Text style={{ paddingRight: 10, paddingLeft: 20, paddingBottom: 20, textAlign: 'left', fontFamily: 'Mont', fontSize: 20, color: '#fff' }}>{user.name}</Text>
           <View style={{ width: '100%', flexDirection: 'row' }}>
             <View style={{ width: '42%', height: 100, flexDirection: 'column', marginLeft: 4 }}>
-              <Text style={{ textAlign: 'center', fontFamily: 'Mont-Bold', fontSize: 17, color: '#fff', paddingBottom: 5 }}>15</Text>
+              <Text style={{ textAlign: 'center', fontFamily: 'Mont-Bold', fontSize: 17, color: '#fff', paddingBottom: 5 }}>{user.friends}</Text>
               <Text style={{ textAlign: 'center', fontFamily: 'Mont', fontSize: 15, color: '#fff' }}>Friends</Text>   
             </View>
             <View style={{ width: '42%', height: 100, flexDirection: 'column' }}>
-              <Text style={{ textAlign: 'center', fontFamily: 'Mont-Bold', fontSize: 17, color: '#fff', paddingBottom: 5 }}>160</Text>
+              <Text style={{ textAlign: 'center', fontFamily: 'Mont-Bold', fontSize: 17, color: '#fff', paddingBottom: 5 }}>{user.stories}</Text>
               <Text style={{ textAlign: 'center', fontFamily: 'Mont', fontSize: 15, color: '#fff' }}>Stories</Text>
             </View>
           </View>

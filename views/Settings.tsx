@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, AsyncStorage } from 'react-native';
 import { NavigationContainerProps } from 'react-navigation';
 import { Overlay, Button, colors } from 'react-native-elements';
 import { useDispatch } from 'react-redux';
-import { SET_USER } from '../redux/actionTypes';
+import { SET_USER, SET_CREDENTIALS } from '../redux/actionTypes';
 
 import AppHeader from '../components/AppHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -19,7 +19,9 @@ const Settings: React.FC<NavigationContainerProps> = ({ navigation }) => {
     await firebase.auth().signOut()
       .then(async () => {
         await AsyncStorage.removeItem('USER');
+        await AsyncStorage.removeItem('CREDENTIALS');
         dispatch({ type: SET_USER, payload: { user: null } });
+        dispatch({ type: SET_CREDENTIALS, payload: { credentials: null } });
         navigation.navigate('Auth');
       });
   }
@@ -69,25 +71,25 @@ const Settings: React.FC<NavigationContainerProps> = ({ navigation }) => {
       <Button
         title='Edit Profile'
         type='outline'
-        buttonStyle={{ height: 100, width: '100%', borderRightWidth: 0, borderLeftWidth: 0, justifyContent: 'flex-start', borderColor: '#fff' }}
+        buttonStyle={{ height: 100, width: '100%', borderRightWidth: 0, borderLeftWidth: 0, justifyContent: 'flex-start', borderColor: '#999' }}
         titleStyle={{ fontFamily: 'Mont', fontSize: 27, color: '#fff', textAlign: 'left', paddingLeft: 15 }}
         icon={<Icon name='account-edit' size={40} style={{ color: '#fff', marginLeft: 18, marginRight: 10 }} />}
         onPress={() => navigation.navigate('ProfileEdit')}
       />
 
       <Button
-        title='Secondary Color'
+        title='Color Settings'
         type='outline'
-        buttonStyle={{ height: 100, width: '100%', borderRightWidth: 0, borderLeftWidth: 0, justifyContent: 'flex-start', borderColor: '#fff' }}
+        buttonStyle={{ height: 100, width: '100%', borderRightWidth: 0, borderLeftWidth: 0, justifyContent: 'flex-start', borderColor: '#999' }}
         titleStyle={{ fontFamily: 'Mont', fontSize: 27, color: '#fff', textAlign: 'left', paddingLeft: 15 }}
-        icon={<Icon name='account-edit' size={40} style={{ color: '#fff', marginLeft: 18, marginRight: 10 }} />}
+        icon={<Icon name='palette' size={40} style={{ color: '#FCE77D', marginLeft: 18, marginRight: 10 }} />}
         onPress={() => setVisible(true)}
       />
 
       <Button
         title='Logout'
         type='outline'
-        buttonStyle={{ height: 100, width: '100%', borderRightWidth: 0, borderLeftWidth: 0, justifyContent: 'flex-start', borderColor: '#fff' }}
+        buttonStyle={{ height: 100, width: '100%', borderRightWidth: 0, borderLeftWidth: 0, justifyContent: 'flex-start', borderColor: '#999' }}
         titleStyle={{ fontFamily: 'Mont', fontSize: 27, color: '#d93636', textAlign: 'left', paddingLeft: 15 }}
         icon={<Icon name='exit-to-app' size={40} style={{ color: '#fff', marginLeft: 18, marginRight: 10 }} />}
         onPress={() => logout()}

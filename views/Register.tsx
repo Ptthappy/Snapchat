@@ -4,29 +4,76 @@ import { Image, Button, Input } from 'react-native-elements';
 import { NavigationContainerProps } from 'react-navigation';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useDispatch } from 'react-redux';
+import { SET_USER, SET_CREDENTIALS } from '../redux/actionTypes';
 
 import AppHeader from '../components/AppHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
-import { SET_USER } from '../redux/actionTypes';
+import 'firebase/firestore';
+import 'firebase/database';
+import * as ImagePicker from 'expo-image-picker';
+import  LoadingView from './LoadingView';
+
+const options = {
+  mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  allowsEditing: true,
+  aspect: [1, 1]
+};
 
 const Register: React.FC<NavigationContainerProps> = ({ navigation }) => {
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [_password, _setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState('luis26-99@hotmail.com');
+  const [name, setName] = useState('Luis Petrella');
+  const [username, setUsername] = useState('Ptthappy');
+  const [password, setPassword] = useState('101010');
+  const [_password, _setPassword] = useState('101010');
+  const [imgUri, setImgUri] = useState('');
+  const [imgUrl, setImgUrl] = useState('')
+  const database = firebase.database();
 
   const dispatch = useDispatch();
 
   const attemptRegister = async () => {
-    firebase.auth().createUserWithEmailAndPassword(email, password)
-      .then(async data => {
-        await AsyncStorage.setItem('USER', JSON.stringify(firebase.auth().currentUser));
-        dispatch({ type: SET_USER, payload: { user: firebase.auth().currentUser } });
-        navigation.navigate('App');
-      })
+    try  {
+      setLoading(true);
+      if(password === _password) {
+        console.log(email);
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+          .then(async data => {
+            let _url = '';
+            if(imgUri !== '') {
+              const response = await fetch(imgUri)
+              await response.blob()
+                .then(async _blob => {
+                  await firebase.storage().ref().child(data.user.uid).put(_blob).catch(console.log)
+                  await firebase.storage().ref().child(data.user.uid).getDownloadURL().then(url => {
+                    console.log(url);
+                    _url = url
+                  })
+                }).catch(console.log);
+            }
+            database.ref('users/' + data.user.uid).set({ name: name, username: username, friends: 0, stories: 0, imgUrl: _url })
+            await AsyncStorage.setItem('CREDENTIALS', JSON.stringify(firebase.auth().currentUser));
+            await AsyncStorage.setItem('USER', JSON.stringify({ uid: data.user.uid, username: username, name: name, imgUrl: _url, friends: 0, stories: 0 }));
+            dispatch({ type: SET_CREDENTIALS, payload: { credentials: firebase.auth().currentUser } });
+            dispatch({ type: SET_USER, payload: { user: { username: username, name: name, uid: data.user.uid, imgUrl: _url, friends: 0, stories: 0 } } });
+            navigation.navigate('App');
+          }).catch(console.log)
+      }
+    } catch (e) {
+      setLoading(false);
+      console.log(e);
+    }
+  }
+
+  const selectPicture = () => {
+    ImagePicker.launchImageLibraryAsync(options)
+      .then(res => {
+        if(!res.cancelled) {
+          setImgUri(res.uri);
+        }
+      }).catch(console.log);
   }
 
   return (
@@ -41,20 +88,22 @@ const Register: React.FC<NavigationContainerProps> = ({ navigation }) => {
           /> }
         />
 
+        {loading && <LoadingView />}
+
         <View style={{ marginTop: 40 }}>
           <Image
-            source={require('../assets/default.png')}
+            source={ imgUri === '' ? require('../assets/default.png') : { uri: imgUri }}
             style={{ width: 180, height: 180, borderWidth: 2, borderRadius: 1000, borderColor: '#FCE77D' }}
           />
 
           <TouchableOpacity style={{ position: 'relative', height: 50, width: 50, borderRadius: 30, backgroundColor: '#FFDB24', bottom: 52, left: 130,
-            alignItems: 'center', justifyContent: 'center', elevation: 5 }}>
+            alignItems: 'center', justifyContent: 'center', elevation: 5 }} onPress={selectPicture}>
             <Icon name='camera' size={32} style={{ color: '#FFF', elevation: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.5, shadowRadius: 2, }}/>
           </TouchableOpacity>
         </View>
 
         <Input
-            placeholder='Email'
+            placeholder='Email' keyboardType='email-address'
             placeholderTextColor='#A0A0A0'
             leftIcon={<Icon name='email' color='#FFDB24' size={26} style={{ right: 10 }} />}
             containerStyle={{ borderWidth: 1, borderRadius: 30, width: '85%', height: 46, borderColor: '#FCE77D', backgroundColor: '#EAEAEA', justifyContent: 'center' }}
