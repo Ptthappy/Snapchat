@@ -10,12 +10,14 @@ import { NavigationContainerProps } from 'react-navigation';
 
 const PictureView: React.FC<NavigationContainerProps> = ({ navigation }) => {
   const width = Dimensions.get('window').width;
-  const user = useSelector(store => store.user);
+  const user = navigation.getParam('user') ? navigation.getParam('user') : useSelector(store => store.user);
+
+  const _uri = navigation.getParam('uri');
 
   return (
     <View style={{ flex: 1, backgroundColor: '#000', alignItems: 'center' }}>
       <AppHeader
-        title={ typeof navigation.getParam('name') === 'undefined' ? 'Profile Picture' : navigation.getParam('name')}
+        title={ typeof navigation.getParam('user') === 'undefined' ? typeof _uri === 'undefined' ? 'Profile Picture' : 'Preview' : user.name }
         color='#000'
         fontColor='#fff'
         leftComponent={<Button
@@ -26,8 +28,8 @@ const PictureView: React.FC<NavigationContainerProps> = ({ navigation }) => {
       />
 
       <Image
-        source={user.imgUrl === '' ? require('../assets/default.png') : { uri: user.imgUrl }}
-        style={{ width: width, height: width, marginTop: '30%' }}
+        source={_uri ? { uri: _uri } : user.imgUrl === '' ? require('../assets/default.png') : { uri: user.imgUrl }}
+        style={{ width: width, height: typeof _uri === 'undefined' ? width : width * 1.25, marginTop: typeof _uri === 'undefined' ? '30%' : '20%' }}
       />
     </View>
   );

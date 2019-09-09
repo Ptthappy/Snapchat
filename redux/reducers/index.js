@@ -1,8 +1,9 @@
 import { SET_USER, SET_COLOR, SET_CREDENTIALS, SET_FRIEND_REQUESTS, SET_FRIENDS } from '../actionTypes'
+import { yellow_black } from '../../utils/colors';
 
 const initialState = {
   user: null,
-  color: ['#FCE77D', '#F9D342'],
+  color: yellow_black,
   friendRequests: [],
   friends: []
 }

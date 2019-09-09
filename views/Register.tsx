@@ -3,8 +3,8 @@ import { View, TouchableOpacity, KeyboardAvoidingView, ScrollView, AsyncStorage 
 import { Image, Button, Input } from 'react-native-elements';
 import { NavigationContainerProps } from 'react-navigation';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useDispatch } from 'react-redux';
-import { SET_USER, SET_CREDENTIALS } from '../redux/actionTypes';
+import { useDispatch, useSelector } from 'react-redux';
+import { SET_USER, SET_CREDENTIALS, SET_COLOR } from '../redux/actionTypes';
 
 import AppHeader from '../components/AppHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -23,16 +23,17 @@ const options = {
 
 const Register: React.FC<NavigationContainerProps> = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState('luis26-99@hotmail.com');
-  const [name, setName] = useState('Luis Petrella');
-  const [username, setUsername] = useState('Ptthappy');
-  const [password, setPassword] = useState('101010');
-  const [_password, _setPassword] = useState('101010');
+  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [_password, _setPassword] = useState('');
   const [imgUri, setImgUri] = useState('');
   const [imgUrl, setImgUrl] = useState('')
   const database = firebase.database();
 
   const dispatch = useDispatch();
+  const colors = useSelector(store => store.color);
 
   const attemptRegister = async () => {
     try  {
@@ -54,8 +55,8 @@ const Register: React.FC<NavigationContainerProps> = ({ navigation }) => {
                 }).catch(console.log);
             }
             database.ref('users/' + data.user.uid).set({ name: name, username: username, friends: 0, stories: 0, imgUrl: _url })
-            await AsyncStorage.setItem('CREDENTIALS', JSON.stringify(firebase.auth().currentUser));
-            await AsyncStorage.setItem('USER', JSON.stringify({ uid: data.user.uid, username: username, name: name, imgUrl: _url, friends: 0, stories: 0 }));
+            await AsyncStorage.setItem('SNAP-CREDENTIALS', JSON.stringify(firebase.auth().currentUser));
+            await AsyncStorage.setItem('SNAP-USER', JSON.stringify({ uid: data.user.uid, username: username, name: name, imgUrl: _url, friends: 0, stories: 0 }));
             dispatch({ type: SET_CREDENTIALS, payload: { credentials: firebase.auth().currentUser } });
             dispatch({ type: SET_USER, payload: { user: { username: username, name: name, uid: data.user.uid, imgUrl: _url, friends: 0, stories: 0 } } });
             navigation.navigate('App');
@@ -78,11 +79,12 @@ const Register: React.FC<NavigationContainerProps> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior='padding'>
-      <ScrollView style={{ backgroundColor: '#292826', width: '100%', height: '100%' }} contentContainerStyle={{ alignItems: 'center' }}>
+      <ScrollView style={{ backgroundColor: colors.primary, width: '100%', height: '100%' }} contentContainerStyle={{ alignItems: 'center' }}>
         <AppHeader
           title='Register User'
+          color={colors.secondary}
           leftComponent={<Button
-            icon={<Icon name='arrow-left' size={25} style={{ color: '#292826' }} />}
+            icon={<Icon name='arrow-left' size={25} style={{ color: colors.primary }} />}
             buttonStyle={{ height: 35, width: 35, borderRadius: 1000, marginTop: -23, paddingRight: 5, backgroundColor: 'transparent' }}
             onPress={() => navigation.goBack()}
           /> }
@@ -96,7 +98,7 @@ const Register: React.FC<NavigationContainerProps> = ({ navigation }) => {
             style={{ width: 180, height: 180, borderWidth: 2, borderRadius: 1000, borderColor: '#FCE77D' }}
           />
 
-          <TouchableOpacity style={{ position: 'relative', height: 50, width: 50, borderRadius: 30, backgroundColor: '#FFDB24', bottom: 52, left: 130,
+          <TouchableOpacity style={{ position: 'relative', height: 50, width: 50, borderRadius: 30, backgroundColor: colors.secondary, bottom: 52, left: 130,
             alignItems: 'center', justifyContent: 'center', elevation: 5 }} onPress={selectPicture}>
             <Icon name='camera' size={32} style={{ color: '#FFF', elevation: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.5, shadowRadius: 2, }}/>
           </TouchableOpacity>
@@ -169,7 +171,7 @@ const Register: React.FC<NavigationContainerProps> = ({ navigation }) => {
             secureTextEntry
           />
 
-        <LinearGradient colors={['#dec12f', '#fae473']} style={{ width: '90%', height: 42, marginTop: 40, marginBottom: 40, borderRadius: 30,
+        <LinearGradient colors={[colors.secondary, colors.secondary]} style={{ width: '90%', height: 42, marginTop: 40, marginBottom: 40, borderRadius: 30,
           alignItems: 'center', justifyContent: 'center' }} start={[0, 0]}>
           <Button containerStyle={{ backgroundColor: 'transparent', width: '100%', height: '100%' }} buttonStyle={{ backgroundColor: 'transparent', width: '100%', height: '100%' }} 
             titleStyle={{ fontFamily: 'Mont-Bold', color: '#FFF' }} title="Register" onPress={() => attemptRegister()}/>

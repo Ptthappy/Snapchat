@@ -3,7 +3,7 @@ import { View, Text, ActivityIndicator, TouchableOpacity, AsyncStorage } from 'r
 import { Button, Image } from 'react-native-elements';
 import { NavigationContainerProps } from 'react-navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { SET_FRIEND_REQUESTS, SET_USER } from '../redux/actionTypes';
+import { SET_FRIEND_REQUESTS, SET_USER, SET_FRIENDS } from '../redux/actionTypes';
 
 import AppHeader from '../components/AppHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -17,6 +17,8 @@ const Requests: React.FC<NavigationContainerProps> = ({ navigation }) => {
   const [loading, setLoading] = useState(false)
 
   const _user = useSelector(store => store.user);
+  const friends = useSelector(store => store.friends);
+  const colors = useSelector(store => store.color);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -52,11 +54,15 @@ const Requests: React.FC<NavigationContainerProps> = ({ navigation }) => {
     firebase.database().ref('users/').child(user.uid).update({ "friends": user.friends + 1 })
 
     let newUser = _user;
+    let _friends = friends;
+    _friends.push(user);
     newUser.friends += 1;
     dispatch({ type: SET_FRIEND_REQUESTS, payload:{ friendRequests: newRequests } });
     dispatch({ type: SET_USER, payload: { user: newUser } })
+    dispatch({ type: SET_FRIENDS, payload: { friends: _friends }})
     await AsyncStorage.setItem('FRIEND-REQUESTS', JSON.stringify(newRequests));
     await AsyncStorage.setItem('USER', JSON.stringify(newUser));
+    await AsyncStorage.setItem('FRIENDS', JSON.stringify({ friends: _friends }));
   }
 
   const decline = async (uid) => {
@@ -74,27 +80,28 @@ const Requests: React.FC<NavigationContainerProps> = ({ navigation }) => {
   //TODO: Iterar los ids para traerse los users
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#292826' }}>
+    <View style={{ flex: 1, backgroundColor: colors.primary }}>
       {loading && <LoadingView />}
       <AppHeader
         title='Friend Requests'
+        color={colors.secondary}
         leftComponent={<Button
-          icon={<Icon name='arrow-left' size={25} style={{ color: '#292826' }} />}
+          icon={<Icon name='arrow-left' size={25} style={{ color: colors.primary }} />}
           buttonStyle={{ height: 35, width: 35, borderRadius: 1000, marginTop: -23, paddingRight: 5, backgroundColor: 'transparent' }}
           onPress={() => navigation.goBack() }
         /> }
       />
 
       {users.map((user, i) => 
-        <View style={{ width: '100%', height: 100, backgroundColor: '#272624', flexDirection: 'row', alignItems: 'center' }} key={i}>
+        <View style={{ width: '100%', height: 100, backgroundColor: colors.bolder, flexDirection: 'row', alignItems: 'center' }} key={i}>
           <Image
             source={user.imgUrl === '' ? require('../assets/default.png') : { uri: user.imgUrl }}
-            style={{ height: 75, width: 75, borderRadius: 100, borderWidth: 1, borderColor: '#FCE77D', marginHorizontal: 10 }}
+            style={{ height: 75, width: 75, borderRadius: 100, borderWidth: 1, borderColor: colors.secondary, marginHorizontal: 10 }}
             PlaceholderContent={<ActivityIndicator />}
           />
           <View style={{ flexDirection: 'column' }}>
-            <Text style={{ fontFamily: 'Mont-Light', fontSize: 14, color: '#d0d0d0' }}>{user.name}</Text>
-            <Text style={{ fontFamily: 'Mont-Light', fontSize: 14, color: '#d0d0d0' }}>@{user.username}</Text>
+            <Text style={{ fontFamily: 'Mont-Light', fontSize: 14, color: colors.fonts }}>{user.name}</Text>
+            <Text style={{ fontFamily: 'Mont-Light', fontSize: 14, color: colors.fonts }}>@{user.username}</Text>
           </View>
           <TouchableOpacity style={{ marginLeft: 'auto' }} onPress={() => decline(user.uid)}>
             <Icon name='window-close' size={35} style={{ color: '#c71414' }} />

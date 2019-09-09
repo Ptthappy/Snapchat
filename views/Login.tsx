@@ -3,7 +3,7 @@ import { View, Text, AsyncStorage, Keyboard } from 'react-native';
 import { Button, Image, Input } from 'react-native-elements';
 import { NavigationContainerProps } from 'react-navigation';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import * as firebase from 'firebase';
 import "firebase/auth";
@@ -20,6 +20,7 @@ const Login: React.FC<NavigationContainerProps> = ({ navigation }) => {
   const [imgUrl, setImgUrl] = useState('');
 
   const dispatch = useDispatch();
+  const colors = useSelector(store => store.color);
 
   const login = async () => {
     setLoading(true);
@@ -39,7 +40,7 @@ const Login: React.FC<NavigationContainerProps> = ({ navigation }) => {
               for(const x in friendSnap.val()) {
                 requests.push(x);
               }
-              await AsyncStorage.setItem('FRIEND-REQUESTS', JSON.stringify(requests));
+              await AsyncStorage.setItem('SNAP-FRIEND-REQUESTS', JSON.stringify(requests));
               dispatch({ type: SET_FRIEND_REQUESTS, payload: { friendRequests: requests } })
             })
 
@@ -52,12 +53,12 @@ const Login: React.FC<NavigationContainerProps> = ({ navigation }) => {
                 })
               }
               console.log(friends);
-              await AsyncStorage.setItem('FRIENDS', JSON.stringify(friends));
+              await AsyncStorage.setItem('SNAP-FRIENDS', JSON.stringify(friends));
               dispatch({ type: SET_FRIENDS, payload: { friends: friends } })
             });
 
-            await AsyncStorage.setItem('CREDENTIALS', JSON.stringify(firebase.auth().currentUser));
-            await AsyncStorage.setItem('USER', JSON.stringify({ username: username, name: name, uid: firebase.auth().currentUser.uid, imgUrl: imgUrl, friends: friends, stories: stories }));
+            await AsyncStorage.setItem('SNAP-CREDENTIALS', JSON.stringify(firebase.auth().currentUser));
+            await AsyncStorage.setItem('SNAP-USER', JSON.stringify({ username: username, name: name, uid: firebase.auth().currentUser.uid, imgUrl: imgUrl, friends: friends, stories: stories }));
             dispatch({ type: SET_CREDENTIALS, payload: { credentials: firebase.auth().currentUser } });
             dispatch({ type: SET_USER, payload: { user: { username: username, name: name, uid: firebase.auth().currentUser.uid, imgUrl: imgUrl, friends: friends, stories: stories } } })
             navigation.navigate('App');
@@ -70,11 +71,12 @@ const Login: React.FC<NavigationContainerProps> = ({ navigation }) => {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#292826', alignItems: 'center' }}>
+    <View style={{ flex: 1, backgroundColor: colors.primary, alignItems: 'center' }}>
       <AppHeader
         title='Snap Application'
+        color={colors.secondary}
         leftComponent={<Button
-          icon={<Icon name='arrow-left' size={25} style={{ color: '#292826' }} />}
+          icon={<Icon name='arrow-left' size={25} style={{ color: colors.primary }} />}
           buttonStyle={{ height: 35, width: 35, borderRadius: 1000, marginTop: -23, paddingRight: 5, backgroundColor: 'transparent' }}
           onPress={() => navigation.goBack()}
         /> }
@@ -113,14 +115,14 @@ const Login: React.FC<NavigationContainerProps> = ({ navigation }) => {
         secureTextEntry    
       />
 
-      <LinearGradient colors={['#dec12f', '#fae473']} style={{ width: '90%', height: 42, marginTop: 20, borderRadius: 30,
+      <LinearGradient colors={[colors.secondary, colors.secondary]} style={{ width: '90%', height: 42, marginTop: 20, borderRadius: 30,
         alignItems: 'center', justifyContent: 'center' }} start={[0, 0]}>
         <Button containerStyle={{ backgroundColor: 'transparent', width: '100%', height: '100%' }} buttonStyle={{ backgroundColor: 'transparent', width: '100%', height: '100%' }} 
           titleStyle={{ fontFamily: 'Mont-Bold', color: '#FFF' }} title="Login" onPress={() => login()}/>
       </LinearGradient>
 
-      <Text style={{ fontFamily: 'Mont', fontSize: 17, color: '#EAEAEA', marginVertical: 10, marginRight: 20, marginLeft: 30 }}>Do not have an account? 
-        Create one <Text style={{ color: '#FCE77D', fontFamily: 'Mont-Bold' }} onPress={() => navigation.navigate('Register')}>here</Text></Text>
+      <Text style={{ fontFamily: 'Mont', fontSize: 17, color: colors.fonts, marginVertical: 10, marginRight: 20, marginLeft: 30 }}>Do not have an account? 
+        Create one <Text style={{ color: colors.secondary, fontFamily: 'Mont-Bold' }} onPress={() => navigation.navigate('Register')}>here</Text></Text>
     </View>
   );
 }

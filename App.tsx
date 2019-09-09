@@ -3,7 +3,8 @@ import { StatusBar, View, StyleSheet, Platform, AsyncStorage } from 'react-nativ
 import { createStackNavigator, createAppContainer, NavigationContainer, createBottomTabNavigator } from 'react-navigation';
 import { Provider, useDispatch, useSelector, connect } from 'react-redux'
 import { AppLoading } from 'expo';
-import { SET_USER, SET_CREDENTIALS, SET_FRIEND_REQUESTS, SET_FRIENDS } from './redux/actionTypes'
+import { SET_USER, SET_CREDENTIALS, SET_FRIEND_REQUESTS, SET_FRIENDS, SET_COLOR } from './redux/actionTypes'
+import { yellow_black } from './utils/colors';
 
 import StackViewStyleInterpolator from 'react-navigation-stack/src/views/StackView/StackViewStyleInterpolator';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -18,8 +19,6 @@ import Register from './views/Register';
 import Timeline from './views/Timeline';
 import Profile from './views/Profile';
 import Story from './views/Story';
-import CameraView from './views/CameraView';
-import AddPicture from './views/AddPicture';
 import FriendList from './views/FriendList';
 import RecentChats from './views/RecentChats';
 import Chat from './views/Chat';
@@ -46,6 +45,7 @@ const ConsumerApp: React.FC = () => {
 
   const dispatch = useDispatch();
   const credentials = useSelector(state => state.credentials);
+  const colors = useSelector(store => store.color);
   
   const [ready, setReady] = useState(false);
 
@@ -60,11 +60,21 @@ const ConsumerApp: React.FC = () => {
   }
 
   const _retrieveState = async () => {
-    const _credentials = await AsyncStorage.getItem('CREDENTIALS');
-    const _user = await AsyncStorage.getItem('USER');
+    //Dev
+    // await AsyncStorage.removeItem('SNAP-CREDENTIALS');
+    // await AsyncStorage.removeItem('SNAP-USER');
+    // await AsyncStorage.setItem('SNAP-COLOR', JSON.stringify({ primaryColor: '#292826', secondaryColor: '#F9D342', tiny: '#111', fonts: '#d0d0d0', placeholder: '#666' }))
+    // await AsyncStorage.removeItem('SNAP-COLOR');
+    // await AsyncStorage.removeItem('SNAP-COLOR');
+    // await AsyncStorage.setItem('SNAP-COLOR', JSON.stringify(yellow_black))
+
+    const _credentials = await AsyncStorage.getItem('SNAP-CREDENTIALS');
+    const _user = await AsyncStorage.getItem('SNAP-USER');
+    const _color = await AsyncStorage.getItem('SNAP-COLOR');
+    dispatch({ type: SET_COLOR, payload: { color: JSON.parse(_color) } })
     if(_credentials !== null) {
-      const _friendRequests = await AsyncStorage.getItem('FRIEND-REQUESTS');
-      const _friends = await AsyncStorage.getItem('FRIENDS');
+      const _friendRequests = await AsyncStorage.getItem('SNAP-FRIEND-REQUESTS');
+      const _friends = await AsyncStorage.getItem('SNAP-FRIENDS');
       dispatch({ type: SET_CREDENTIALS, payload: { credentials: JSON.parse(_credentials) } })
       dispatch({ type: SET_USER, payload: { user: JSON.parse(_user) } });
       dispatch({ type: SET_FRIEND_REQUESTS, payload: { friendRequests: JSON.parse(_friendRequests) } })
@@ -95,9 +105,7 @@ const ConsumerApp: React.FC = () => {
     Timeline: Timeline,
     Profile: Profile,
     PictureView: PictureView,
-    Story: Story,
-    Camera: CameraView,
-    AddPicture: AddPicture
+    Story: Story
   }, { 
     headerMode: 'none',
     transitionConfig: () => ({
@@ -140,12 +148,12 @@ const ConsumerApp: React.FC = () => {
     tabBarOptions: {
       style: {
         borderTopWidth: 0.2,
-        borderTopColor: '#FCE77D'
+        borderTopColor: colors.secondary
       },
-      activeTintColor: '#FCE77D',
+      activeTintColor: colors.secondary,
       labelStyle: { fontFamily: 'Mont-Light', top: 0 },
-      activeBackgroundColor: '#292826',
-      inactiveBackgroundColor: '#292826',
+      activeBackgroundColor: colors.primary,
+      inactiveBackgroundColor: colors.primary,
     }, defaultNavigationOptions: ({ navigation }) => ({
       tabBarIcon: ({ focused, tintColor }) => {
         const { routeName } = navigation.state;

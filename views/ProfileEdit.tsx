@@ -20,7 +20,10 @@ const options = {
 const ProfileEdit: React.FC<NavigationContainerProps> = ({ navigation }) => {
   const [changeUser, setChangeUser] = useState(false);
   const [changeUsername, setChangeUsername] = useState(false);
+  
   const user = useSelector(store => store.user);
+  const colors = useSelector(store => store.color);
+
   let imgUrl = '';
 
   const dispatch = useDispatch();
@@ -62,11 +65,12 @@ const ProfileEdit: React.FC<NavigationContainerProps> = ({ navigation }) => {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#292826', alignItems: 'center' }}>
+    <View style={{ flex: 1, backgroundColor: colors.primary, alignItems: 'center' }}>
       <AppHeader
         title='Edit Profile'
+        color={colors.secondary}
         leftComponent={<Button
-          icon={<Icon name='arrow-left' size={25} style={{ color: '#292826' }} />}
+          icon={<Icon name='arrow-left' size={25} style={{ color: colors.primary }} />}
           buttonStyle={{ height: 35, width: 35, borderRadius: 1000, marginTop: -23, paddingRight: 5, backgroundColor: 'transparent' }}
           onPress={() => navigation.goBack() }
         /> }
@@ -74,31 +78,31 @@ const ProfileEdit: React.FC<NavigationContainerProps> = ({ navigation }) => {
 
       <Image
         source={user.imgUrl !== '' ? { uri: user.imgUrl } : require('../assets/default.png')}
-        style={{ width: 300, height: 300, borderRadius: 2, borderWidth: 2, borderColor: '#FCE77D', marginTop: 32, marginBottom: 32, backgroundColor: user.imgUrl === '' ? '#4a76d4' : 'transparent' }}
+        style={{ width: 300, height: 300, borderRadius: 2, borderWidth: 2, borderColor: colors.secondary, marginTop: 32, marginBottom: 32, backgroundColor: user.imgUrl === '' ? '#4a76d4' : 'transparent' }}
       />
 
       <Button
         title='Change Profile Photo'
-        buttonStyle={{ width: 200, height: 48, borderRadius: 30, backgroundColor: '#F9D342' }}
-        titleStyle={{ fontFamily: 'Mont', fontSize: 16, color: '#000' }}
+        buttonStyle={{ width: 200, height: 48, borderRadius: 30, backgroundColor: colors.secondary }}
+        titleStyle={{ fontFamily: 'Mont', fontSize: 16, color: colors.primary }}
         onPress={selectPicture}
       />
 
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', alignItems: 'center', marginTop: 30 }}>
-        <Text style={{ fontFamily: 'Mont', fontSize: 19, color: '#fff', paddingLeft: 20 }}>{user.username}</Text>
+        <Text style={{ fontFamily: 'Mont', fontSize: 19, color: colors.fonts, paddingLeft: 20 }}>{user.username}</Text>
         <Button
           title='Change Username'
           buttonStyle={{ backgroundColor: 'transparent', marginRight: 25 }}
-          titleStyle={{ fontFamily: 'Mont', fontSize: 16, color: '#F9D342' }}
+          titleStyle={{ fontFamily: 'Mont', fontSize: 16, color: colors.secondary }}
           onPress={() => console.log('Felicidades eres gai')}
         />
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', alignItems: 'center', marginTop: 18 }}>
-        <Text style={{ fontFamily: 'Mont', fontSize: 19, color: '#fff', paddingLeft: 20 }}>{user.name}</Text>
+        <Text style={{ fontFamily: 'Mont', fontSize: 19, color: colors.fonts, paddingLeft: 20 }}>{user.name}</Text>
         <Button
           title='Change Name'
           buttonStyle={{ backgroundColor: 'transparent', marginRight: 25 }}
-          titleStyle={{ fontFamily: 'Mont', fontSize: 16, color: '#F9D342' }}
+          titleStyle={{ fontFamily: 'Mont', fontSize: 16, color: colors.secondary }}
           onPress={() => console.log('Felicidades eres gai')}
         />
       </View>
