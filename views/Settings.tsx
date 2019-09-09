@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, AsyncStorage } from 'react-native';
 import { NavigationContainerProps } from 'react-navigation';
 import { Overlay, Button, colors } from 'react-native-elements';
 import { useDispatch } from 'react-redux';
-import { SET_USER, SET_CREDENTIALS } from '../redux/actionTypes';
+import { SET_USER, SET_CREDENTIALS, SET_FRIENDS, SET_FRIEND_REQUESTS } from '../redux/actionTypes';
 
 import AppHeader from '../components/AppHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -20,8 +20,12 @@ const Settings: React.FC<NavigationContainerProps> = ({ navigation }) => {
       .then(async () => {
         await AsyncStorage.removeItem('USER');
         await AsyncStorage.removeItem('CREDENTIALS');
+        await AsyncStorage.removeItem('FRIEND-REQUESTS');
+        await AsyncStorage.removeItem('FRIENDS');
         dispatch({ type: SET_USER, payload: { user: null } });
         dispatch({ type: SET_CREDENTIALS, payload: { credentials: null } });
+        dispatch({ type: SET_FRIENDS, payload: { friends: null } });
+        dispatch({ type: SET_FRIEND_REQUESTS, payload: { friendRequests: null } });
         navigation.navigate('Auth');
       });
   }

@@ -1,4 +1,4 @@
-import { SET_USER, SET_COLOR, SET_CREDENTIALS } from './actionTypes';
+import { SET_USER, SET_COLOR, SET_CREDENTIALS, SET_FRIEND_LIST, SET_FRIENDS } from './actionTypes';
 
 export const setUser = user => ({
   type: SET_USER,
@@ -13,4 +13,14 @@ export const setColor = color => ({
 export const setCredentials = credentials => ({
   type: SET_CREDENTIALS,
   payoad: { credentials }
+})
+
+export const setFriendRequests = friendRequests => ({
+  type: SET_FRIEND_REQUESTS,
+  payload: { friendRequests }
+})
+
+export const setFriends = friends => ({
+  type: SET_FRIENDS,
+  payload: { friends }
 })

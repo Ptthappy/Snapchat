@@ -45,11 +45,12 @@ const Search: React.FC<NavigationContainerProps> = ({ navigation }) => {
 
   const sendFriendRequest = async (uid) => {
     setLoading(true);
-    await firebase.database().ref('friends/' + uid).once('value').then(async snap => {
+    await firebase.database().ref('requests/' + uid).once('value').then(async snap => {
       console.log(snap.val());
       let body = snap.val();
+      if(body === null) body = {};
       body[user.uid] = true;
-      await firebase.database().ref('friends/' + uid).set(body);
+      await firebase.database().ref('requests/' + uid).set(body);
       setLoading(false);
     }).catch(err => {
       console.log(err);

@@ -9,7 +9,7 @@ import * as firebase from 'firebase';
 import "firebase/auth";
 import AppHeader from '../components/AppHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { SET_USER, SET_CREDENTIALS } from '../redux/actionTypes';
+import { SET_USER, SET_CREDENTIALS, SET_FRIEND_REQUESTS, SET_FRIENDS } from '../redux/actionTypes';
 import LoadingView from './LoadingView';
 
 const Login: React.FC<NavigationContainerProps> = ({ navigation }) => {
@@ -33,6 +33,29 @@ const Login: React.FC<NavigationContainerProps> = ({ navigation }) => {
             const friends = snap.val().friends;
             const stories = snap.val().stories;
             const imgUrl = snap.val().imgUrl;
+            //Friend requests
+            await firebase.database().ref('requests/' + firebase.auth().currentUser.uid).once('value').then(async friendSnap => {
+              let requests = [];
+              for(const x in friendSnap.val()) {
+                requests.push(x);
+              }
+              await AsyncStorage.setItem('FRIEND-REQUESTS', JSON.stringify(requests));
+              dispatch({ type: SET_FRIEND_REQUESTS, payload: { friendRequests: requests } })
+            })
+
+            //Friends
+            await firebase.database().ref('friends/' + firebase.auth().currentUser.uid).once('value').then(async friendSnap => {
+              let friends = [];
+              for(const i in friendSnap.val()) {
+                await firebase.database().ref('users/' + i).once('value').then(async userSnap => {
+                  friends.push(userSnap.val());
+                })
+              }
+              console.log(friends);
+              await AsyncStorage.setItem('FRIENDS', JSON.stringify(friends));
+              dispatch({ type: SET_FRIENDS, payload: { friends: friends } })
+            });
+
             await AsyncStorage.setItem('CREDENTIALS', JSON.stringify(firebase.auth().currentUser));
             await AsyncStorage.setItem('USER', JSON.stringify({ username: username, name: name, uid: firebase.auth().currentUser.uid, imgUrl: imgUrl, friends: friends, stories: stories }));
             dispatch({ type: SET_CREDENTIALS, payload: { credentials: firebase.auth().currentUser } });

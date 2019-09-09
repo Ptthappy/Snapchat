@@ -1,9 +1,10 @@
-import { SET_USER, SET_COLOR, SET_CREDENTIALS } from '../actionTypes'
-import { AsyncStorage } from 'react-native'
+import { SET_USER, SET_COLOR, SET_CREDENTIALS, SET_FRIEND_REQUESTS, SET_FRIENDS } from '../actionTypes'
 
 const initialState = {
   user: null,
-  color: ['#FCE77D', '#F9D342']
+  color: ['#FCE77D', '#F9D342'],
+  friendRequests: [],
+  friends: []
 }
 
 export default function(state = initialState, action) {
@@ -29,6 +30,20 @@ export default function(state = initialState, action) {
       return {
         ...state,
         credentials: credentials
+      }
+
+    case SET_FRIEND_REQUESTS:
+      const { friendRequests } = action.payload;
+      return {
+        ...state,
+        friendRequests: friendRequests
+      }
+
+    case SET_FRIENDS:
+      const { friends } = action.payload;
+      return {
+        ...state,
+        friends: friends
       }
 
     default: return state;

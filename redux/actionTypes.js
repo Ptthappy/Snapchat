@@ -1,3 +1,5 @@
 export const SET_USER = 'SET_USER';
 export const SET_COLOR = 'SET_COLOR';
 export const SET_CREDENTIALS = 'SET_CREDENTIALS'
+export const SET_FRIEND_REQUESTS = 'SET_FRIEND_REQUESTS';
+export const SET_FRIENDS = 'SET_FRIENDS'

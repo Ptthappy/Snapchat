@@ -3,7 +3,7 @@ import { StatusBar, View, StyleSheet, Platform, AsyncStorage } from 'react-nativ
 import { createStackNavigator, createAppContainer, NavigationContainer, createBottomTabNavigator } from 'react-navigation';
 import { Provider, useDispatch, useSelector, connect } from 'react-redux'
 import { AppLoading } from 'expo';
-import { SET_USER, SET_CREDENTIALS } from './redux/actionTypes'
+import { SET_USER, SET_CREDENTIALS, SET_FRIEND_REQUESTS, SET_FRIENDS } from './redux/actionTypes'
 
 import StackViewStyleInterpolator from 'react-navigation-stack/src/views/StackView/StackViewStyleInterpolator';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -63,8 +63,12 @@ const ConsumerApp: React.FC = () => {
     const _credentials = await AsyncStorage.getItem('CREDENTIALS');
     const _user = await AsyncStorage.getItem('USER');
     if(_credentials !== null) {
+      const _friendRequests = await AsyncStorage.getItem('FRIEND-REQUESTS');
+      const _friends = await AsyncStorage.getItem('FRIENDS');
       dispatch({ type: SET_CREDENTIALS, payload: { credentials: JSON.parse(_credentials) } })
       dispatch({ type: SET_USER, payload: { user: JSON.parse(_user) } });
+      dispatch({ type: SET_FRIEND_REQUESTS, payload: { friendRequests: JSON.parse(_friendRequests) } })
+      dispatch({ type: SET_FRIENDS, payload: { friends: JSON.parse(_friends) } })
     }
   }
 
