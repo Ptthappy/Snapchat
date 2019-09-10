@@ -49,7 +49,9 @@ const Login: React.FC<NavigationContainerProps> = ({ navigation }) => {
               let friends = [];
               for(const i in friendSnap.val()) {
                 await firebase.database().ref('users/' + i).once('value').then(async userSnap => {
-                  friends.push(userSnap.val());
+                  let friend = userSnap.val();
+                  friend.uid = i;
+                  friends.push(friend);
                 })
               }
               console.log(friends);

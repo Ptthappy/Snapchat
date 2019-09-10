@@ -29,7 +29,7 @@ const PictureView: React.FC<NavigationContainerProps> = ({ navigation }) => {
 
       <Image
         source={_uri ? { uri: _uri } : user.imgUrl === '' ? require('../assets/default.png') : { uri: user.imgUrl }}
-        style={{ width: width, height: typeof _uri === 'undefined' ? width : width * 1.25, marginTop: typeof _uri === 'undefined' ? '30%' : '20%' }}
+        style={{ width: width, height: typeof _uri === 'undefined' ? width : width * 3/4, marginTop: '30%' }}
       />
     </View>
   );
